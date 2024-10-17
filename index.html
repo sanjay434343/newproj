@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Import Firebase SDK as a module -->
+    <script type="module">
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            "projectId": "dropshipping-98eb5",
+  "apiKey": "AIzaSyC3WxZBaNJoZA2p7oe6ihTJCFOE6Y0U_7Q",
+  "authDomain": "dropshipping-98eb5.firebaseapp.com",
+  "databaseURL": "https://dropshipping-98eb5-default-rtdb.firebaseio.com",
+  "storageBucket": "dropshipping-98eb5.appspot.com",
+  "messagingSenderId": "904925867242",
+  "appId": "1:904925867242:android:4f6a2b1619f00100f8fb93"
+        };
+
+        // Import Firebase libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Google Login
+        document.getElementById('google-login').addEventListener('click', () => {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).then((result) => {
+                const user = result.user;
+                displayContent(user);
+            }).catch((error) => {
+                console.error(error);
+            });
+        });
+
+        // Email Login
+        document.getElementById('email-login').addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    displayContent(user);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        });
+
+        // Display content after login
+        function displayContent(user) {
+            document.querySelector('div:first-child').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+        }
+
+        // Share Button
+        document.getElementById('share-button').addEventListener('click', () => {
+            const image = document.getElementById('share-image').src;
+            const link = document.getElementById('link').textContent;
+            const caption = "Check this out!";
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Share Link',
+                    text: caption,
+                    url: link,
+                    files: [new File([image], 'image.jpg')]
+                }).then(() => {
+                    console.log('Shared successfully');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                alert('Sharing not supported on this browser.');
+            }
+        });
+
+        // Open Modal
+        document.getElementById('open-modal').addEventListener('click', () => {
+            document.getElementById('modal').classList.remove('hidden');
+        });
+
+        // Close Modal
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        // Submit Details
+        document.getElementById('submit-details').addEventListener('click', () => {
+            const screenshot = document.getElementById('screenshot').value;
+            const message = document.getElementById('message').value;
+            console.log('Screenshot URL:', screenshot);
+            console.log('Message:', message);
+            // Here you can also add Firebase logic to save these details
+
+            // Close the modal after submission
+            document.getElementById('modal').classList.add('hidden');
+        });
+    </script>
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-center">Login</h2>
+        <div>
+            <button id="google-login" class="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-500">Login with Google</button>
+        </div>
+        <div>
+            <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring" required>
+        </div>
+        <div>
+            <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring" required>
+        </div>
+        <div>
+            <button id="email-login" class="w-full px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-500">Login with Email</button>
+        </div>
+    </div>
+
+    <div id="content" class="hidden p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold">Welcome!</h2>
+        <img id="share-image" src="https://via.placeholder.com/150" alt="Share Image" class="w-full h-auto">
+        <p id="link">Link: <span class="text-blue-600">https://example.com</span></p>
+        <button id="share-button" class="px-4 py-2 text-white bg-purple-600 rounded-md hover:bg-purple-500">Share</button>
+        <button id="open-modal" class="px-4 py-2 text-white bg-yellow-600 rounded-md hover:bg-yellow-500">Submit Details</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold">Submit Details</h3>
+            <textarea id="screenshot" placeholder="Screenshot URL" class="w-full h-24 px-4 py-2 border rounded-md"></textarea>
+            <textarea id="message" placeholder="Message" class="w-full h-24 px-4 py-2 border rounded-md"></textarea>
+            <button id="submit-details" class="mt-4 px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-500">Submit</button>
+            <button id="close-modal" class="mt-2 px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-500">Close</button>
+        </div>
+    </div>
+</body>
+
+</html>
